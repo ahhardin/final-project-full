@@ -1,7 +1,7 @@
 body {
   margin: 0;
   padding: 0;
-  font-family: sans-serif;
+  font-family: 'Raleway', sans-serif;
 }
 
 .div {
@@ -9,18 +9,60 @@ body {
 }
 
 .Header-bar {
-  background-color: #77ba99;
+  background-color: #59414D;
 }
 
 .Header-bar-brand {
-  color: #283e48;
-  font-size: 1.5rem;
+  color: #B2AC82;
+  font-size: 48px;
+  font-family: 'Chicle', cursive;
 }
 
 .Header-login, .Header-login:active, .Header-login:visited {
-  color: #283e48;
+  color: #B2AC82;
+}
+
+.header-text {
+  color: #B2AC82;
 }
 
 .Header-login:hover {
   text-decoration: underline;
+}
+
+.modules {
+  cursor: pointer;
+  list-style-type: none;
+  list-style-position: outside;
+}
+
+.lesson-item {
+  cursor: pointer;
+  list-style-type: decimal;
+}
+
+ul.modules {
+    margin-left: 5px;
+    margin-right: 0px;
+    padding-left: 10px;
+    padding-right: 0px;
+
+}
+
+ul.lesson-item {
+  list-style-position: outside;
+  list-style-type: decimal;
+}
+
+.active {
+    background-color: #59414D;
+}
+
+.sidebar {
+  background-color: #276A72;
+  color: #B2AC82
+}
+
+.sidebar-header {
+    font-family: 'Chicle', cursive;
 }

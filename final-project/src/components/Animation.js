@@ -1,90 +1,153 @@
 import React, { Component } from 'react';
 import Matter from 'matter-js'
-// import { Engine, Render, Bodies, World } from 'matter-js'
 import ReactDOM from 'react-dom';
+import { connect } from 'react-redux';
+import { restartAnimation } from '../actions';
+import { bindActionCreators } from "redux";
 
 class Animation extends Component {
   constructor() {
     super()
 
     this.state = {
-      initialSpeed: 0
+      speed_x: 0,
+      speed_y: 0
     }
 
-    this.Engine = Matter.Engine,
-    this.Render = Matter.Render,
-    this.World = Matter.World,
-    this.Bodies = Matter.Bodies;
-    this.engine = this.Engine.create();
-    this.circleA
+    this.Engine = Matter.Engine
+    this.Render = Matter.Render
+    this.World = Matter.World
+    this.Bodies = Matter.Bodies
+    this.engine = this.Engine.create()
+
   }
 
-  componentDidMount() {
+  componentDidMount = () => {
 
-    const canvasWidth = this.divElement.clientWidth*.85
-    const canvasHeight = 600
+    this.renderVariable = this.setUp(false)
 
-    // create a renderer
-    const render = this.Render.create({
-      element: ReactDOM.findDOMNode(this),
-      engine: this.engine,
-      options: {
-        width: canvasWidth,
-        height: canvasHeight,
-        pixelRatio: 1,
-        background: '#CD644D',
-        wireframes: false
-      }
-    });
+  }
+
+  setUp = (reset) => {
+
+    const canvasWidth = this.divElement.clientWidth
+    const canvasHeight = 300
+    let render = this.renderVariable
+
+    if (!reset) {
+      render = this.Render.create({
+        element: this.props.restart ? ReactDOM.findDOMNode(this) : null,
+        engine: this.engine,
+        options: {
+          width: canvasWidth,
+          height: canvasHeight,
+          pixelRatio: 1,
+          background: '#B2AC82',
+          wireframes: false
+        }
+      });
+    }
 
     //animation parameters
-    const buildingHeight = canvasHeight*.80
-    const buildingWidth = 80
-    const ballRadius = 15
-    const groundHeight = 40
+    const buildingHeight = canvasHeight * .75
+    const buildingWidth = canvasWidth * .15
+    const ballRadius = canvasHeight * .05
+    const groundHeight = canvasHeight * .1
 
-    // create two boxes and a ground
-    this.circleA = this.Bodies.circle(buildingWidth-ballRadius/10, canvasHeight-buildingHeight-ballRadius, ballRadius, {friction: 0, frictionStatic: 0, frictionAir: 0, render: {
-         fillStyle: '#6C9873',
-    }})
-    const ground = this.Bodies.rectangle(canvasWidth/2, canvasHeight-groundHeight/2, canvasWidth, groundHeight, { isStatic: true });
-    const building = this.Bodies.rectangle(buildingWidth/2,canvasHeight-(canvasHeight*.80/2), buildingWidth, buildingHeight, { isStatic: true, friction: 1, frictionStatic: 1, frictionAir: 1 } )
-
+    // create a building, the ground, and an object to project off the building
+    this.circleA = this.Bodies.circle(buildingWidth - ballRadius / 8, canvasHeight - buildingHeight - ballRadius, ballRadius, {
+      friction: 0,
+      frictionStatic: 0,
+      frictionAir: 0,
+      render: {
+        fillStyle: '#276A72'
+      }
+    })
+    this.ground = this.Bodies.rectangle(canvasWidth / 2, canvasHeight - groundHeight / 2, canvasWidth, groundHeight, { isStatic: true });
+    this.building = this.Bodies.rectangle(buildingWidth / 2, canvasHeight - (buildingHeight / 2), buildingWidth, buildingHeight, {
+      isStatic: true,
+      friction: 1,
+      frictionStatic: 1,
+      frictionAir: 1,
+      render: {
+        fillStyle: '#59414D'
+      }
+    })
 
     // add all of the bodies to the world
-    this.World.add(this.engine.world, [building, this.circleA, ground]);
+    this.World.add(this.engine.world, [this.building, this.circleA, this.ground]);
 
     // run the renderer
+    if (!reset) {
     this.Render.run(render);
+  }
+
+    return (render)
 
   }
 
   onInputChange = (event) => {
-
-    this.setState({initialSpeed: event.target.value}, () => {
-        Matter.Body.setVelocity(this.circleA, {x: this.state.initialSpeed, y: -2 })
-    })
+    if (event.target.getAttribute("id") === "xSpeed") {
+      this.setState({ speed_x: event.target.value }, () => {
+        Matter.Body.setVelocity(this.circleA, { x: this.state.speed_x, y: -this.state.speed_y })
+      })
+    } else if (event.target.getAttribute("id") === "ySpeed") {
+      this.setState({ speed_y: event.target.value }, () => {
+        Matter.Body.setVelocity(this.circleA, { x: this.state.speed_x, y: -this.state.speed_y })
+      })
+    }
   }
 
   onStart = (event) => {
+    Matter.Body.setVelocity(this.circleA, { x: this.state.speed_x, y: -this.state.speed_y })
     // run the engine
     this.Engine.run(this.engine);
   }
 
   onReset = (event) => {
-    Matter.Render.stop(this.render); // this only stop renderer but not destroy canvas
-    Matter.Composite.remove(this.engine.world, this.circleA)
+    this.props.restartAnimation(this.props.restart)
+    // remove bodies
+    this.World.remove(this.engine.world, [this.building, this.circleA, this.ground]);
 
+    this.Render.stop(this.renderVariable);
+
+
+    // clear world and engine
+    this.World.clear(this.engine.world);
+
+    // remove events
+    this.engine.events = {};
+    this.Engine.clear(this.engine);
+
+    // const timeScale = this.engine.timing.timeScale
+    // this.engine.timing.timeScale = .75
+
+    this.setUp(true);
   }
 
   render() {
     return (
       <div className="animation-container"
-        ref={ (divElement) => this.divElement = divElement}>
-        inital speed:<input value={this.state.initialSpeed} onChange={this.onInputChange}></input><button className="btn" onClick={this.onStart}>START</button><button className="btn" onClick={this.onReset}>RESET</button>
-      </div>
+          ref={ (divElement) => this.divElement = divElement}>
+          <div>initial horizontal speed:<input size="3" id="xSpeed"
+            value={this.state.speed_x} onChange={this.onInputChange}></input> m/s</div>
+          <div>initial vertical speed:<input size="3" id="ySpeed" value={this.state.speed_y} onChange={this.onInputChange}></input> m/s</div>
+
+          <button className="btn btn-outline-secondary" onClick={this.onStart}>START</button>
+
+          <button className="btn btn-outline-secondary" onClick={this.onReset}>RESET</button>
+        </div>
     )
   }
 }
 
-export default Animation;
+function mapStateToProps(state) {
+  return { restart: state.restart };
+}
+
+function mapDispatchToProps(dispatch) {
+  return bindActionCreators({ restartAnimation }, dispatch);
+}
+
+
+export default connect(mapStateToProps, mapDispatchToProps)(Animation);

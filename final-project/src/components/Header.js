@@ -8,9 +8,9 @@ class Header extends Component {
     return (
       <div className='container-fluid'>
         <div className='Header-bar row text-center'>
-          <div className='col-2 py-3 cursor-pointer'><FontAwesomeIcon icon='bars' color='#283e48' size='lg' /></div>
-          <div className='col-8 mt-2 Header-bar-brand'>Learn Physics</div>
-          <div className='col-2 py-3'>Login</div>
+          <div className='col-2 my-auto cursor-pointer header-text'><FontAwesomeIcon icon='bars' color='#B2AC82' size='lg' /></div>
+          <div className='col-8 my-auto Header-bar-brand'>Physics Playground</div>
+          <div className='col-2 header-text my-auto'>Login</div>
         </div>
       </div>
     );
