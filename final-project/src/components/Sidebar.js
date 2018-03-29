@@ -5,18 +5,13 @@ import { bindActionCreators } from "redux";
 
 class Sidebar extends Component {
 
-  componentWillMount() {
-    this.props.fetchModules().then(res => {
-      this.props.setCurrentModule("1").then(res => {
-        this.props.setCurrentLesson("1")
-      })
-    })
-  }
-
   handleClick = (event) => {
     event.persist()
     this.props.setCurrentModule(event.target.getAttribute('module-id')).then(res => {
-      this.props.setCurrentLesson(this.props.currentModule.mID, event.target.getAttribute('lesson-id'))
+      this.props.setCurrentLesson(this.props.currentModule.mID, event.target.getAttribute('lesson-id')).then(res => {
+        localStorage.setItem('mID', this.props.currentModule.mID)
+        localStorage.setItem('lID', this.props.currentLesson.lID)
+      })
     })
   }
 

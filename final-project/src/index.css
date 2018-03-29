@@ -4,6 +4,15 @@ body {
   font-family: 'Raleway', sans-serif;
 }
 
+.eqn-num {
+  font-size: 18px;
+  padding-left: 18px
+}
+
+table{
+  margin: 0 auto;
+}
+
 .div {
   border: 1px solid red;
 }

@@ -14,11 +14,13 @@ class Animation extends Component {
       speed_y: 0
     }
 
+    this.colors = ["#59414D","#B2AC82","#A5567F","#276A72","#9FE8F2"]
     this.Engine = Matter.Engine
     this.Render = Matter.Render
     this.World = Matter.World
     this.Bodies = Matter.Bodies
     this.engine = this.Engine.create()
+    this.runner = Matter.Runner.create()
 
   }
 
@@ -55,12 +57,12 @@ class Animation extends Component {
     const groundHeight = canvasHeight * .1
 
     // create a building, the ground, and an object to project off the building
-    this.circleA = this.Bodies.circle(buildingWidth - ballRadius / 8, canvasHeight - buildingHeight - ballRadius, ballRadius, {
+    this.circleA = this.Bodies.circle(buildingWidth - ballRadius / 4, canvasHeight - buildingHeight - ballRadius, ballRadius, {
       friction: 0,
       frictionStatic: 0,
       frictionAir: 0,
       render: {
-        fillStyle: '#276A72'
+        fillStyle: this.colors[3]
       }
     })
     this.ground = this.Bodies.rectangle(canvasWidth / 2, canvasHeight - groundHeight / 2, canvasWidth, groundHeight, { isStatic: true });
@@ -68,14 +70,15 @@ class Animation extends Component {
       isStatic: true,
       friction: 1,
       frictionStatic: 1,
-      frictionAir: 1,
+      frictionAir: 0,
       render: {
-        fillStyle: '#59414D'
+        fillStyle: this.colors[0]
       }
     })
 
     // add all of the bodies to the world
     this.World.add(this.engine.world, [this.building, this.circleA, this.ground]);
+    this.engine.world.gravity.y = .98
 
     // run the renderer
     if (!reset) {
@@ -101,22 +104,21 @@ class Animation extends Component {
   onStart = (event) => {
     Matter.Body.setVelocity(this.circleA, { x: this.state.speed_x, y: -this.state.speed_y })
     // run the engine
-    this.Engine.run(this.engine);
+    Matter.Runner.start(this.runner, this.engine)
   }
 
   onReset = (event) => {
     this.props.restartAnimation(this.props.restart)
     // remove bodies
-    this.World.remove(this.engine.world, [this.building, this.circleA, this.ground]);
-
-    this.Render.stop(this.renderVariable);
-
+    this.World.remove(this.engine.world, [this.building, this.circleA, this.ground])
 
     // clear world and engine
     this.World.clear(this.engine.world);
 
+    Matter.Runner.stop(this.runner)
+
     // remove events
-    this.engine.events = {};
+    this.Engine.events = {};
     this.Engine.clear(this.engine);
 
     // const timeScale = this.engine.timing.timeScale

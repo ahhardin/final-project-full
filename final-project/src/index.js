@@ -10,6 +10,7 @@ import './index.css';
 
 const colors = ["#59414D","#B2AC82","#A5567F","#276A72","#9FE8F2"]
 
+
 const store = createStore(rootReducers, {}, applyMiddleware(reduxThunk));
 
 ReactDOM.render(

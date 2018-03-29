@@ -6,17 +6,11 @@ import { connect } from 'react-redux';
 
 class Lesson extends Component {
 
-  componentWillReceiveProps(nextProps) {
-    if (this.props.restart !== nextProps.restart) {
-      this.render()
-    }
- }
-
   render() {
     return (
       <div className="lesson">
         <Explanation />
-        <Animation restart={this.props.restart}/>
+        <Animation/>
         <Quiz/>
       </div>
         );
@@ -24,7 +18,7 @@ class Lesson extends Component {
 }
 
 function mapStateToProps(state) {
-  return { restart: state.restart };
+  return { restart: state.restart, currentLesson: state.currentLesson };
 }
 
 // function mapDispatchToProps(dispatch) {
